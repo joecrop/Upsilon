@@ -103,7 +103,7 @@ Expression BasedInteger::shallowReduce() {
   if (numerator.isOverflow() || denominator.isOverflow()) {
     result = Number::FloatNumber(node()->integer().template approximate<double>());
   } else {
-    result = Rational::Builder(numerator, denominator);
+    result = Rational::Builder(numerator, denominator, true);
   }
   replaceWithInPlace(result);
   return result;

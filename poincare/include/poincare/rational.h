@@ -76,7 +76,7 @@ class Rational final : public Number {
 public:
   /* The constructor build a irreducible fraction */
   Rational(const RationalNode * node) : Number(node) {}
-  static Rational Builder(Integer & num, Integer & den);
+  static Rational Builder(Integer & num, Integer & den, bool allowFixedPoint = false);
   static Rational Builder(const Integer & numerator);
   static Rational Builder(native_int_t i);
   static Rational Builder(native_int_t i, native_int_t j);
@@ -111,6 +111,7 @@ public:
   static Rational Multiplication(const Rational & i, const Rational & j);
   // IntegerPower of (p1/q1)^(p2) --> (p1^p2)/(q1^p2)
   static Rational IntegerPower(const Rational & i, const Integer & j);
+  static Rational toFixedPoint(const Rational &a);
   static int NaturalOrder(const Rational & i, const Rational & j) { return RationalNode::NaturalOrder(i.node(), j.node()); }
 
   // Simplification

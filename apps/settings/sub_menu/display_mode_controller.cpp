@@ -1,5 +1,6 @@
 #include "display_mode_controller.h"
 #include "../../shared/poincare_helpers.h"
+#include "../../apps_container.h"
 #include <assert.h>
 #include <cmath>
 #include "../app.h"
@@ -13,10 +14,13 @@ namespace Settings {
 
 DisplayModeController::DisplayModeController(Responder * parentResponder, InputEventHandlerDelegate * inputEventHandlerDelegate) :
   PreferencesController(parentResponder),
-  m_editableCell(&m_selectableTableView, inputEventHandlerDelegate, this)
+  m_editableCell(&m_selectableTableView, inputEventHandlerDelegate, this),
+  m_editableCell2(&m_selectableTableView, inputEventHandlerDelegate, this)
 {
   m_editableCell.messageTableCellWithEditableText()->setMessage(I18n::Message::SignificantFigures);
   m_editableCell.messageTableCellWithEditableText()->setMessageFont(KDFont::LargeFont);
+  m_editableCell2.messageTableCellWithEditableText()->setMessage(I18n::Message::FixedPrecision);
+  m_editableCell2.messageTableCellWithEditableText()->setMessageFont(KDFont::LargeFont);
 }
 
 KDCoordinate DisplayModeController::rowHeight(int j) {
@@ -39,6 +43,11 @@ HighlightCell * DisplayModeController::reusableCell(int index, int type) {
     assert(index == 0);
     return &m_editableCell;
   }
+  if (type == k_fixedPrecisionType)
+  {
+    assert(index == 0);
+    return &m_editableCell2;
+  }
   return PreferencesController::reusableCell(index, type);
 }
 
@@ -46,22 +55,33 @@ int DisplayModeController::reusableCellCount(int type) {
   if (type == k_resultFormatType) {
     return PreferencesController::k_totalNumberOfCell;
   }
-  assert(type == k_significantDigitsType);
-  return 1;
+  assert(type == k_significantDigitsType || type == k_fixedPrecisionType);
+  return 2;
 }
 
 int DisplayModeController::typeAtLocation(int i, int j) {
-  return (j == numberOfRows() - 1 ? k_significantDigitsType : k_resultFormatType);
+  return (j == numberOfRows() - 2 ? k_significantDigitsType : (j == numberOfRows() - 1 ? k_fixedPrecisionType : k_resultFormatType));
 }
 
 void DisplayModeController::willDisplayCellForIndex(HighlightCell * cell, int index) {
-  /* Number of significants figure row */
-  if (index == numberOfRows()-1) {
+  /* Number of significant figures row */
+  if (index == numberOfRows()-2) {
     MessageTableCellWithEditableTextWithSeparator * myCell = (MessageTableCellWithEditableTextWithSeparator *)cell;
     GenericSubController::willDisplayCellForIndex(myCell->messageTableCellWithEditableText(), index);
     constexpr int bufferSize = 3;
     char buffer[bufferSize];
     Integer(Preferences::sharedPreferences()->numberOfSignificantDigits()).serialize(buffer, bufferSize);
+    myCell->messageTableCellWithEditableText()->setAccessoryText(buffer);
+    return;
+  }
+  /* Number of fixed point digits row */
+  if (index == numberOfRows() - 1)
+  {
+    MessageTableCellWithEditableTextWithSeparator *myCell = (MessageTableCellWithEditableTextWithSeparator *)cell;
+    GenericSubController::willDisplayCellForIndex(myCell->messageTableCellWithEditableText(), index);
+    constexpr int bufferSize = 3;
+    char buffer[bufferSize];
+    Integer(Preferences::sharedPreferences()->numberOfFixedPointDigits()).serialize(buffer, bufferSize);
     myCell->messageTableCellWithEditableText()->setAccessoryText(buffer);
     return;
   }
@@ -74,25 +94,46 @@ bool DisplayModeController::textFieldShouldFinishEditing(TextField * textField, 
 }
 
 bool DisplayModeController::textFieldDidFinishEditing(TextField * textField, const char * text, Ion::Events::Event event) {
-  double floatBody;
-  if (textFieldDelegateApp()->hasUndefinedValue(text, floatBody)) {
-    return false;
+  /* Number of significant figures row */
+  if (selectedRow() == numberOfRows() - 2)
+  {
+    double floatBody;
+    if (textFieldDelegateApp()->hasUndefinedValue(text, floatBody)) {
+      return false;
+    }
+    if (floatBody < 1.0) {
+    floatBody = 1.0;
+    }
+    if (Preferences::sharedPreferences()->displayMode() == Preferences::PrintFloatMode::Engineering && floatBody < 3.0) {
+      floatBody = 3.0;
+    }
+    if (floatBody > PrintFloat::k_numberOfStoredSignificantDigits) {
+      floatBody = PrintFloat::k_numberOfStoredSignificantDigits;
+    }
+    Preferences::sharedPreferences()->setNumberOfSignificantDigits((char)std::round(floatBody));
+    m_selectableTableView.reloadCellAtLocation(0, selectedRow());
+    if (event == Ion::Events::Up || event == Ion::Events::OK) {
+      m_selectableTableView.handleEvent(event);
+    }
+    return true;
   }
-  if (floatBody < 1.0) {
-   floatBody = 1.0;
+  else
+  {
+    /* Number of fixed point digits row */
+    double floatBody;
+    if (textFieldDelegateApp()->hasUndefinedValue(text, floatBody))
+    {
+      return false;
+    }
+    Preferences::sharedPreferences()->setNumberOfFixedPointDigits((char)std::round(floatBody));
+    m_selectableTableView.reloadCellAtLocation(0, selectedRow());
+    if (event == Ion::Events::Up || event == Ion::Events::OK)
+    {
+      AppsContainer::sharedAppsContainer()->refreshPreferences();
+      m_selectableTableView.handleEvent(event);
+    }
+    return true;
   }
-  if (Preferences::sharedPreferences()->displayMode() == Preferences::PrintFloatMode::Engineering && floatBody < 3.0) {
-    floatBody = 3.0;
-  }
-  if (floatBody > PrintFloat::k_numberOfStoredSignificantDigits) {
-    floatBody = PrintFloat::k_numberOfStoredSignificantDigits;
-  }
-  Preferences::sharedPreferences()->setNumberOfSignificantDigits((char)std::round(floatBody));
-  m_selectableTableView.reloadCellAtLocation(0, selectedRow());
-  if (event == Ion::Events::Up || event == Ion::Events::OK) {
-    m_selectableTableView.handleEvent(event);
-  }
-  return true;
 }
 
 }

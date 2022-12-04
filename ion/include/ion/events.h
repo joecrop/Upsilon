@@ -166,6 +166,8 @@ constexpr Event Greater = Event::ShiftKey(Keyboard::Key::Square);
 
 constexpr Event BrightnessPlus = Event::ShiftKey(Keyboard::Key::Plus);
 constexpr Event BrightnessMinus = Event::ShiftKey(Keyboard::Key::Minus);
+constexpr Event FixedPointPlus = Event::ShiftKey(Keyboard::Key::Multiplication);
+constexpr Event FixedPointMinus = Event::ShiftKey(Keyboard::Key::Division);
 
 constexpr Event DoubleParenthesis = Event::ShiftKey(Keyboard::Key::LeftParenthesis);
 

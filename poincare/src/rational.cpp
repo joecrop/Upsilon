@@ -153,7 +153,14 @@ Expression RationalNode::denominator(ReductionContext reductionContext) const {
 
 // Constructors
 
-Rational Rational::Builder(Integer & num, Integer & den) {
+Rational Rational::Builder(Integer & num, Integer & den, bool allowFixedPoint) {
+  uint8_t points = Preferences::sharedPreferences()->numberOfFixedPointDigits();
+  if (points != 0 && allowFixedPoint)
+  {
+    //truncate in fixed point mode
+    num = Integer::toFixedPoint(Integer::Division(num, den).quotient, points);
+    den = Integer(1);
+  }
   assert(!den.isZero());
   if (!num.isOne() && !den.isOne()) {
     // Avoid computing GCD if possible
@@ -200,13 +207,23 @@ bool Rational::numeratorOrDenominatorIsInfinity() const {
 Rational Rational::Addition(const Rational & i, const Rational & j) {
   Integer newNumerator = Integer::Addition(Integer::Multiplication(i.signedIntegerNumerator(), j.integerDenominator()), Integer::Multiplication(j.signedIntegerNumerator(), i.integerDenominator()));
   Integer newDenominator = Integer::Multiplication(i.integerDenominator(), j.integerDenominator());
-  return Rational::Builder(newNumerator, newDenominator);
+  return Rational::Builder(newNumerator, newDenominator, true);
 }
 
 Rational Rational::Multiplication(const Rational & i, const Rational & j) {
+  // A/B * C/D = A*C / B*D
+  // With floating precision this is fine, but with fixed precision this is not rounded correctly.
+  //The rational numbers must be truncated before being multiplied.
+  uint8_t points = Preferences::sharedPreferences()->numberOfFixedPointDigits();
+  if (points != 0)
+  {
+    //TODO: expand to support fixed decimal point... for now we truncate
+    assert(i.integerDenominator().isOne());
+    assert(j.integerDenominator().isOne());
+  }
   Integer newNumerator = Integer::Multiplication(i.signedIntegerNumerator(), j.signedIntegerNumerator());
   Integer newDenominator = Integer::Multiplication(i.integerDenominator(), j.integerDenominator());
-  return Rational::Builder(newNumerator, newDenominator);
+  return Rational::toFixedPoint(Rational::Builder(newNumerator, newDenominator));
 }
 
 Rational Rational::IntegerPower(const Rational & i, const Integer & j) {
@@ -215,9 +232,25 @@ Rational Rational::IntegerPower(const Rational & i, const Integer & j) {
   Integer newNumerator = Integer::Power(i.signedIntegerNumerator(), absJ);
   Integer newDenominator = Integer::Power(i.integerDenominator(), absJ);
   if (j.isNegative()) {
-    return Rational::Builder(newDenominator, newNumerator);
+    return Rational::toFixedPoint(Rational::Builder(newDenominator, newNumerator));
   }
-  return Rational::Builder(newNumerator, newDenominator);
+  return Rational::toFixedPoint(Rational::Builder(newDenominator, newNumerator));
+}
+
+Rational Rational::toFixedPoint(const Rational &a)
+{
+  // only do conversion when enabled
+  uint8_t points = Preferences::sharedPreferences()->numberOfFixedPointDigits();
+  if (points != 0)
+  {
+    Integer val = Integer::Division(a.signedIntegerNumerator(), a.integerDenominator()).quotient;
+    Integer int_val = Integer::toFixedPoint(val, points);
+    return Rational::Builder(int_val);
+  }
+  else
+  {
+    return a;
+  }
 }
 
 Rational Rational::Builder(const native_uint_t * i, uint8_t numeratorSize, const native_uint_t * j, uint8_t denominatorSize, bool negative) {

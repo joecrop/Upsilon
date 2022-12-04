@@ -23,7 +23,9 @@ public:
 private:
   static constexpr int k_resultFormatType = 0;
   static constexpr int k_significantDigitsType = 1;
+  static constexpr int k_fixedPrecisionType = 2;
   MessageTableCellWithEditableTextWithSeparator m_editableCell;
+  MessageTableCellWithEditableTextWithSeparator m_editableCell2;
 };
 
 }

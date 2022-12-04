@@ -154,6 +154,7 @@ public:
   static IntegerDivision Division(const Integer & numerator, const Integer & denominator);
   static Integer Power(const Integer & i, const Integer & j);
   static Integer Factorial(const Integer & i);
+  static Integer toFixedPoint(const Integer &a, uint8_t points);
 
   // Derived expression builder
   static Expression CreateMixedFraction(const Integer & num, const Integer & denom);

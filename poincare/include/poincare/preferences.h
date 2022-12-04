@@ -68,6 +68,14 @@ public:
   void setComplexFormat(Preferences::ComplexFormat complexFormat) { m_complexFormat = complexFormat; }
   uint8_t numberOfSignificantDigits() const { return m_numberOfSignificantDigits; }
   void setNumberOfSignificantDigits(uint8_t numberOfSignificantDigits) { m_numberOfSignificantDigits = numberOfSignificantDigits; }
+  uint8_t numberOfFixedPointDigits() const { return m_numberOfFixedPointDigits; }
+  void setNumberOfFixedPointDigits(uint8_t numberOfFixedPointDigits)
+  {
+    if (numberOfFixedPointDigits < 65) // lower bound is handled by uint rollover
+    {
+      m_numberOfFixedPointDigits = numberOfFixedPointDigits;
+    }
+  }
   SymbolMultiplication symbolOfMultiplication() const { return m_symbolMultiplication; }
   void setSymbolMultiplication(SymbolMultiplication symbolOfMultiplication) { m_symbolMultiplication = symbolOfMultiplication; }
   SymbolFunction symbolOfFunction() const { return m_symbolFunction; }
@@ -81,6 +89,7 @@ private:
   EditionMode m_editionMode;
   ComplexFormat m_complexFormat;
   uint8_t m_numberOfSignificantDigits;
+  uint8_t m_numberOfFixedPointDigits;
   SymbolMultiplication m_symbolMultiplication;
   SymbolFunction m_symbolFunction;
   PythonFont m_pythonFont;

@@ -19,7 +19,7 @@ namespace Settings {
 
 extern const Shared::SettingsMessageTree s_modelAngleChildren[3];
 extern const Shared::SettingsMessageTree s_modelEditionModeChildren[2];
-extern const Shared::SettingsMessageTree s_modelFloatDisplayModeChildren[4];
+extern const Shared::SettingsMessageTree s_modelFloatDisplayModeChildren[5];
 extern const Shared::SettingsMessageTree s_modelComplexFormatChildren[3];
 extern const Shared::SettingsMessageTree s_symbolChildren[4];
 extern const Shared::SettingsMessageTree s_symbolFunctionChildren[3];
