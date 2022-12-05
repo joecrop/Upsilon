@@ -184,6 +184,9 @@ void TitleBarView::refreshPreferences() {
       }
       numberOfChar += strlcpy(buffer + numberOfChar, buf, bufferSize - numberOfChar);
       numberOfChar += strlcpy(buffer + numberOfChar, ")", bufferSize - numberOfChar);
+      m_preferenceView.setBackgroundColor(Palette::BatteryLow);
+    } else {
+      m_preferenceView.setBackgroundColor(Palette::Toolbar);
     }
   }
   
