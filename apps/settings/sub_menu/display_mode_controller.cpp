@@ -123,7 +123,7 @@ bool DisplayModeController::textFieldDidFinishEditing(TextField * textField, con
     double floatBody;
     uint8_t points = Preferences::sharedPreferences()->numberOfFixedPointDigits();
     // set the points to allow the user to enter a number up to 256
-    Preferences::sharedPreferences()->setNumberOfFixedPointDigits((char)8);
+    Preferences::sharedPreferences()->setNumberOfFixedPointDigits(0);
     if (textFieldDelegateApp()->hasUndefinedValue(text, floatBody))
     {
       Preferences::sharedPreferences()->setNumberOfFixedPointDigits(points);
