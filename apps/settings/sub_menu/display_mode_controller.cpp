@@ -121,8 +121,12 @@ bool DisplayModeController::textFieldDidFinishEditing(TextField * textField, con
   {
     /* Number of fixed point digits row */
     double floatBody;
+    uint8_t points = Preferences::sharedPreferences()->numberOfFixedPointDigits();
+    // set the points to allow the user to enter a number up to 256
+    Preferences::sharedPreferences()->setNumberOfFixedPointDigits((char)8);
     if (textFieldDelegateApp()->hasUndefinedValue(text, floatBody))
     {
+      Preferences::sharedPreferences()->setNumberOfFixedPointDigits(points);
       return false;
     }
     Preferences::sharedPreferences()->setNumberOfFixedPointDigits((char)std::round(floatBody));
