@@ -27,7 +27,7 @@ Integer::Base baseAtIndex(int index) {
 void IntegerListController::setExpression(Poincare::Expression e) {
   ExpressionsListController::setExpression(e);
   static_assert(k_maxNumberOfRows >= k_indexOfFactorExpression + 1, "k_maxNumberOfRows must be greater than k_indexOfFactorExpression");
-  assert(!m_expression.isUninitialized() && m_expression.type() == ExpressionNode::Type::BasedInteger);
+  assert(!m_expression.isUninitialized() && m_expression.type() == ExpressionNode::Type::BasedInteger || (m_expression.type() == ExpressionNode::Type::Opposite && m_expression.childAtIndex(0).type() == ExpressionNode::Type::BasedInteger));
   assert(!m_expression.isUninitialized());
 
   if (m_expression.type() == ExpressionNode::Type::BasedInteger) {
@@ -42,7 +42,9 @@ void IntegerListController::setExpression(Poincare::Expression e) {
     Expression e = b.childAtIndex(0);
     Integer childInt = static_cast<BasedInteger &>(e).integer();
     Integer integer = Integer::Multiplication(childInt, Integer(-1));
-    m_layouts[0] = integer.createLayout(baseAtIndex(0));
+    for (int index = 0; index < k_indexOfFactorExpression; ++index) {
+      m_layouts[index] = integer.createLayout(baseAtIndex(index));
+    }
   }
   // Computing factorExpression
   Expression factor = Factor::Builder(m_expression.clone());
