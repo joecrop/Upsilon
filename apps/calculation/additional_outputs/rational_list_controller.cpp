@@ -17,7 +17,7 @@ Integer extractInteger(const Expression e) {
 void RationalListController::setExpression(Poincare::Expression e) {
   ExpressionsListController::setExpression(e);
   assert(!m_expression.isUninitialized());
-  static_assert(k_maxNumberOfRows >= 2, "k_maxNumberOfRows must be greater than 2");
+  static_assert(k_maxNumberOfRows >= 3, "k_maxNumberOfRows must be greater than 2");
 
   bool negative = false;
   Expression div = m_expression;
@@ -34,14 +34,22 @@ void RationalListController::setExpression(Poincare::Expression e) {
   int index = 0;
   m_layouts[index++] = PoincareHelpers::CreateLayout(Integer::CreateMixedFraction(numerator, denominator));
   m_layouts[index++] = PoincareHelpers::CreateLayout(Integer::CreateEuclideanDivision(numerator, denominator));
+
+  // Computing engineering notation
+  double num_d = numerator.approximate<double>();
+  double dub = num_d / denominator.approximate<double>();
+  Float<double> f = Float<double>::Builder(dub);
+  m_layouts[index++] = f.createLayout(Preferences::PrintFloatMode::Engineering, Preferences::MediumNumberOfSignificantDigits);
 }
 
 I18n::Message RationalListController::messageAtIndex(int index) {
   switch (index) {
     case 0:
       return I18n::Message::MixedFraction;
-    default:
+    case 1:
       return I18n::Message::EuclideanDivision;
+    default:
+      return I18n::Message::Engineering;
   }
 }
 
