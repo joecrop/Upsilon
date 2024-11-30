@@ -2,6 +2,8 @@
 #include <poincare/based_integer.h>
 #include <poincare/opposite.h>
 #include <poincare/integer.h>
+#include <poincare/decimal.h>
+#include <poincare/float.h>
 #include <poincare/logarithm.h>
 #include <poincare/empty_layout.h>
 #include <poincare/factor.h>
@@ -33,7 +35,7 @@ void IntegerListController::setExpression(Poincare::Expression e) {
 
   if (m_expression.type() == ExpressionNode::Type::BasedInteger) {
     Integer integer = static_cast<BasedInteger &>(m_expression).integer();
-    for (int index = 0; index < k_indexOfFactorExpression; ++index) {
+    for (int index = 0; index < k_indexOfEngineeringExpression; ++index) {
       m_layouts[index] = integer.createLayout(baseAtIndex(index));
     }
   }
@@ -45,7 +47,7 @@ void IntegerListController::setExpression(Poincare::Expression e) {
     childInt.setNegative(true);
     Integer num_bits = Integer::CeilingLog2(childInt);
     Integer integer = Integer::TwosComplementToBits(childInt, num_bits);
-    for (int index = 0; index < k_indexOfFactorExpression; ++index) {
+    for (int index = 0; index < k_indexOfEngineeringExpression; ++index) {
       if(baseAtIndex(index) == Integer::Base::Decimal) {
         m_layouts[index] = childInt.createLayout(baseAtIndex(index));
       } else {
@@ -53,6 +55,11 @@ void IntegerListController::setExpression(Poincare::Expression e) {
       }
     }
   }
+  // Computing engineering notation
+  Integer integer = static_cast<BasedInteger &>(m_expression).integer();
+  double dub = integer.approximate<double>();
+  Float<double> f = Float<double>::Builder(dub);
+  m_layouts[k_indexOfEngineeringExpression] = f.createLayout(Preferences::PrintFloatMode::Engineering, Preferences::MediumNumberOfSignificantDigits);
   // Computing factorExpression
   Expression factor = Factor::Builder(m_expression.clone());
   PoincareHelpers::Simplify(&factor, App::app()->localContext(), ExpressionNode::ReductionTarget::User);
@@ -69,6 +76,8 @@ I18n::Message IntegerListController::messageAtIndex(int index) {
       return I18n::Message::HexadecimalBase;
     case 2:
       return I18n::Message::BinaryBase;
+    case 3:
+      return I18n::Message::Engineering;
     default:
       return I18n::Message::PrimeFactors;
   }
