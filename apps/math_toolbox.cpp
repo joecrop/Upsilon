@@ -92,6 +92,7 @@ const ToolboxMessageTree logicExplicitChildren[] = {
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitsClearExplicitCommandWithArg, I18n::Message::LogicalBitsClear)};
 
 const ToolboxMessageTree logicChildren[] = {
+  ToolboxMessageTree::Leaf(I18n::Message::CeilingLog2CommandWithArg, I18n::Message::CeilingLog2),
   ToolboxMessageTree::Node(I18n::Message::ExplicitNumberOfBits, logicExplicitChildren),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalAndCommandWithArg, I18n::Message::LogicalAnd),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalOrCommandWithArg, I18n::Message::LogicalOr),
@@ -107,8 +108,7 @@ const ToolboxMessageTree logicChildren[] = {
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitClearCommandWithArg, I18n::Message::LogicalBitClear),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitFlipCommandWithArg, I18n::Message::LogicalBitFlip),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitsClearCommandWithArg, I18n::Message::LogicalBitsClear),
-  ToolboxMessageTree::Leaf(I18n::Message::TwosComplementToBitsCommandWithArg, I18n::Message::TwosComplementToBits),
-  ToolboxMessageTree::Leaf(I18n::Message::CeilingLog2CommandWithArg, I18n::Message::CeilingLog2)
+  ToolboxMessageTree::Leaf(I18n::Message::TwosComplementToBitsCommandWithArg, I18n::Message::TwosComplementToBits)
 };
 
 #if LIST_ARE_DEFINED
@@ -879,6 +879,7 @@ const ToolboxMessageTree menu[] = {
   ToolboxMessageTree::Leaf(I18n::Message::AbsCommandWithArg, I18n::Message::AbsoluteValue),
   ToolboxMessageTree::Leaf(I18n::Message::RootCommandWithArg, I18n::Message::NthRoot),
   ToolboxMessageTree::Leaf(I18n::Message::LogCommandWithArg, I18n::Message::BasedLogarithm),
+  ToolboxMessageTree::Node(I18n::Message::Logic, logicChildren),
   ToolboxMessageTree::Node(I18n::Message::Calculation, calculChildren),
   ToolboxMessageTree::Node(I18n::Message::ComplexNumber, complexChildren),
   ToolboxMessageTree::Node(I18n::Message::Unit, unitChildren),
@@ -895,7 +896,6 @@ const ToolboxMessageTree menu[] = {
   ToolboxMessageTree::Node(I18n::Message::Fluctuation, predictionChildren),
   ToolboxMessageTree::Node(I18n::Message::Chemistry, chemistry),
   ToolboxMessageTree::Node(I18n::Message::Physics, Physics),
-  ToolboxMessageTree::Node(I18n::Message::Logic, logicChildren),
   };
 
 const ToolboxMessageTree toolboxModel = ToolboxMessageTree::Node(I18n::Message::Toolbox, menu);
