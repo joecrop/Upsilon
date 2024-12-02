@@ -56,10 +56,20 @@ void IntegerListController::setExpression(Poincare::Expression e) {
     }
   }
   // Computing engineering notation
-  Integer integer = static_cast<BasedInteger &>(m_expression).integer();
-  double dub = integer.approximate<double>();
-  Float<double> f = Float<double>::Builder(dub);
-  m_layouts[k_indexOfEngineeringExpression] = f.createLayout(Preferences::PrintFloatMode::Engineering, Preferences::MediumNumberOfSignificantDigits);
+  if (m_expression.type() == ExpressionNode::Type::BasedInteger) {
+    Integer integer = static_cast<BasedInteger &>(m_expression).integer();
+    double dub = integer.approximate<double>();
+    Float<double> f = Float<double>::Builder(dub);
+    m_layouts[k_indexOfEngineeringExpression] = f.createLayout(Preferences::PrintFloatMode::Engineering, Preferences::MediumNumberOfSignificantDigits);
+  } else {
+    Opposite b = static_cast<Opposite &>(m_expression);
+    Expression e = b.childAtIndex(0);
+    Integer childInt = static_cast<BasedInteger &>(e).integer();
+    childInt.setNegative(true);
+    double dub = childInt.approximate<double>();
+    Float<double> f = Float<double>::Builder(dub);
+    m_layouts[k_indexOfEngineeringExpression] = f.createLayout(Preferences::PrintFloatMode::Engineering, Preferences::MediumNumberOfSignificantDigits);
+  }
   // Computing factorExpression
   Expression factor = Factor::Builder(m_expression.clone());
   PoincareHelpers::Simplify(&factor, App::app()->localContext(), ExpressionNode::ReductionTarget::User);
