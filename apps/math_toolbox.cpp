@@ -93,6 +93,7 @@ const ToolboxMessageTree logicExplicitChildren[] = {
 
 const ToolboxMessageTree logicChildren[] = {
   ToolboxMessageTree::Leaf(I18n::Message::CeilingLog2CommandWithArg, I18n::Message::CeilingLog2),
+  ToolboxMessageTree::Leaf(I18n::Message::TwosComplementToBitsCommandWithArg, I18n::Message::TwosComplementToBits),
   ToolboxMessageTree::Node(I18n::Message::ExplicitNumberOfBits, logicExplicitChildren),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalAndCommandWithArg, I18n::Message::LogicalAnd),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalOrCommandWithArg, I18n::Message::LogicalOr),
@@ -107,8 +108,7 @@ const ToolboxMessageTree logicChildren[] = {
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitSetCommandWithArg, I18n::Message::LogicalBitSet),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitClearCommandWithArg, I18n::Message::LogicalBitClear),
   ToolboxMessageTree::Leaf(I18n::Message::LogicalBitFlipCommandWithArg, I18n::Message::LogicalBitFlip),
-  ToolboxMessageTree::Leaf(I18n::Message::LogicalBitsClearCommandWithArg, I18n::Message::LogicalBitsClear),
-  ToolboxMessageTree::Leaf(I18n::Message::TwosComplementToBitsCommandWithArg, I18n::Message::TwosComplementToBits)
+  ToolboxMessageTree::Leaf(I18n::Message::LogicalBitsClearCommandWithArg, I18n::Message::LogicalBitsClear)
 };
 
 #if LIST_ARE_DEFINED
